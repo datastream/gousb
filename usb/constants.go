@@ -14,7 +14,13 @@
 
 package usb
 
+// #ifdef __FreeBSD__
+// #include <libusb.h>
+// #define LIBUSB_CLASS_WIRELESS 0xfd
+// #define LIBUSB_CLASS_APPLICATION 0xfe
+// #else
 // #include <libusb-1.0/libusb.h>
+// #endif
 import "C"
 
 type Class uint8

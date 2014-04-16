@@ -1,4 +1,8 @@
+#ifdef __FreeBSD__
+#include <libusb.h>
+#else
 #include <libusb-1.0/libusb.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 
@@ -71,7 +75,7 @@ int extract_data(struct libusb_transfer *xfer, void *raw, int max, unsigned char
 		// Extract first error
 		if (pkt.status == 0 || *status != 0) {
 			continue;
-		}	
+		}
 		*status = pkt.status;
 	}
 	return copied;

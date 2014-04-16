@@ -14,7 +14,17 @@
 
 package usb
 
-// #include <libusb-1.0/libusb.h>
+/*
+#ifdef __FreeBSD__
+#include <libusb.h>
+#define UCHAR uint8_t
+#define UINT uint32_t
+#else
+#include <libusb-1.0/libusb.h>
+#define UCHAR uchar
+#define UINT uint
+#endif
+*/
 import "C"
 
 import (
@@ -76,9 +86,9 @@ func (d *Device) Control(rType, request uint8, val, idx uint16, data []byte) (in
 		C.uint8_t(request),
 		C.uint16_t(val),
 		C.uint16_t(idx),
-		(*C.uchar)(unsafe.Pointer(dataSlice.Data)),
+		(*C.UCHAR)(unsafe.Pointer(dataSlice.Data)),
 		C.uint16_t(len(data)),
-		C.uint(d.ControlTimeout/time.Millisecond))
+		C.UINT(d.ControlTimeout/time.Millisecond))
 	if n < 0 {
 		return int(n), usbError(n)
 	}

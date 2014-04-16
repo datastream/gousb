@@ -15,7 +15,15 @@
 package usb
 
 /*
+#ifdef __FreeBSD__
+#include <libusb.h>
+#define UCHAR uint8_t
+#define UINT uint32_t
+#else
 #include <libusb-1.0/libusb.h>
+#define UCHAR uchar
+#define UINT uint
+#endif
 
 int submit(struct libusb_transfer *xfer);
 void print_xfer(struct libusb_transfer *xfer);
@@ -53,10 +61,10 @@ func (end *endpoint) allocTransfer() *Transfer {
 	done := make(chan struct{}, 1)
 
 	xfer.dev_handle = end.Device.handle
-	xfer.endpoint = C.uchar(end.Address)
+	xfer.endpoint = C.UCHAR(end.Address)
 	xfer._type = C.LIBUSB_TRANSFER_TYPE_ISOCHRONOUS
 
-	xfer.buffer = (*C.uchar)((unsafe.Pointer)(&buf[0]))
+	xfer.buffer = (*C.UCHAR)((unsafe.Pointer)(&buf[0]))
 	xfer.length = C.int(len(buf))
 	xfer.num_iso_packets = iso_packets
 
@@ -88,7 +96,7 @@ type Transfer struct {
 
 func (t *Transfer) Submit(timeout time.Duration) error {
 	//log.Printf("iso: submitting %#v", t.xfer)
-	t.xfer.timeout = C.uint(timeout / time.Millisecond)
+	t.xfer.timeout = C.UINT(timeout / time.Millisecond)
 	if errno := C.submit(t.xfer); errno < 0 {
 		return usbError(errno)
 	}

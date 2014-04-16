@@ -14,7 +14,17 @@
 
 package usb
 
-// #include <libusb-1.0/libusb.h>
+/*
+#ifdef __FreeBSD__
+#include <libusb.h>
+#define UCHAR uint8_t
+#define UINT uint32_t
+#else
+#include <libusb-1.0/libusb.h>
+#define UCHAR uchar
+#define UINT uint
+#endif
+*/
 import "C"
 
 import (
@@ -69,11 +79,11 @@ func bulk_xfer(e *endpoint, buf []byte, timeout time.Duration) (int, error) {
 	var cnt C.int
 	if errno := C.libusb_bulk_transfer(
 		e.handle,
-		C.uchar(e.Address),
-		(*C.uchar)(unsafe.Pointer(data)),
+		C.UCHAR(e.Address),
+		(*C.UCHAR)(unsafe.Pointer(data)),
 		C.int(len(buf)),
 		&cnt,
-		C.uint(timeout/time.Millisecond)); errno < 0 {
+		C.UINT(timeout/time.Millisecond)); errno < 0 {
 		return 0, usbError(errno)
 	}
 	return int(cnt), nil
@@ -89,11 +99,11 @@ func interrupt_xfer(e *endpoint, buf []byte, timeout time.Duration) (int, error)
 	var cnt C.int
 	if errno := C.libusb_interrupt_transfer(
 		e.handle,
-		C.uchar(e.Address),
-		(*C.uchar)(unsafe.Pointer(data)),
+		C.UCHAR(e.Address),
+		(*C.UCHAR)(unsafe.Pointer(data)),
 		C.int(len(buf)),
 		&cnt,
-		C.uint(timeout/time.Millisecond)); errno < 0 {
+		C.UINT(timeout/time.Millisecond)); errno < 0 {
 		return 0, usbError(errno)
 	}
 	return int(cnt), nil

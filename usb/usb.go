@@ -15,8 +15,18 @@
 // Package usb provides a wrapper around libusb-1.0.
 package usb
 
-// #cgo LDFLAGS: -lusb-1.0
-// #include <libusb-1.0/libusb.h>
+/*
+#cgo freebsd LDFLAGS: -lusb
+#cgo darwin LDFLAGS: -lusb-1.0
+#cgo linux LDFLAGS: -lusb-1.0
+#ifdef __FreeBSD__
+#define LIBUSB_CLASS_WIRELESS 0xfd
+#define LIBUSB_CLASS_APPLICATION 0xfe
+#include <libusb.h>
+#else
+#include <libusb-1.0/libusb.h>
+#endif
+*/
 import "C"
 
 import (
